@@ -1,0 +1,67 @@
+<div id="list" data-ng-controller="DataController">
+	<div id="list-header" class="ui-corner-all">
+		<div class="ui-widget-header ui-corner-top">
+			<div>{{ list.title }}</div>
+			<div>{{ list.description }}</div>
+		</div>
+		<table>
+			<thead>
+				<tr data-ng-repeat="header in detailsColumns">
+					<th>{{ header.name }}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<div data-ng-if="nbMaxSectionLevel >= 1">
+					
+				</div>
+				<tr data-ng-repeat="section in detailsColumns">
+				</tr>
+			</tbody>
+		</table>
+		<div data-ng-repeat="section in list.sections" class="ui-corner-all reference">
+		    <div>{{ section.name }}</div>
+		        <span data-ng-if="exp.end">Du {{ exp.start | date:'dd MMMM yyyy' }}  <br />au {{ exp.end | date:'dd MMMM yyyy' }}</span>
+		        <span data-ng-if="!exp.end">Depuis le {{ exp.start | date:'dd MMMM yyyy' }}</span>
+		    </span>
+		    <div class="infos">
+			    <div class="main_label" >{{ exp.as }}</div>
+			    [<div class="company">
+			    	<span data-tooltip>{{ exp.company.name }}</span>
+			    	<div class="tooltip">
+			    		<a href="{{exp.company.url}}" title="Accéder à {{exp.company.name}}" target="_blank">
+			    			<img alt="{{exp.company.url}}" data-ng-src="{{exp.company.logo}}" />
+			    		</a>
+			    	</div>
+			    </div><!-- avoid space with next line
+			    --><div class="client" data-ng-show="exp.client">
+				    	&nbsp;pour <span data-tooltip>{{ exp.client.name }}</span>
+				    	<div class="tooltip">
+				    		<a href="{{exp.client.url}}" title="Accéder à {{exp.client.name}}">
+				    			<img alt="{{exp.client.url}}" data-ng-src="{{exp.client.logo}}" />
+				    		</a>
+				    	</div>
+			    	</div>]
+			    <div class="place">{{ exp.place }}</div>
+			    <div class="description note">
+			        {{ exp.description }}
+			    </div>
+		    </div>
+		</div>
+	</div>
+	<div id="projects" class="ui-corner-all">
+		<h2 class="ui-widget-header ui-corner-top">Projet personnels</h2>
+		<div data-ng-repeat="project in projects" data-skills-list="{{ project.skills }}" class="ui-corner-all reference"> 
+		    <div class="main_label" >{{ project.name }}</div>
+		    <div class="description infos">
+		        {{ project.description }}
+		    </div>
+		</div>
+		<div id="reference" class="reference ui-corner-all">
+    		<h3 class="ui-widget-header ui-corner-all">Références</h3>
+			<ul>
+				<li>Code Center Personnel : <a href="http://code.adi3000.com">http://code.adi3000.com</a></li>
+				<li>GitHub : <a href="https://github.com/Adi3000/">https://github.com/Adi3000/</a></li>
+			</ul>
+		</div>
+	</div>
+</div>

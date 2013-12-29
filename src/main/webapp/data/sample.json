@@ -1,0 +1,125 @@
+{
+	"id":"test",
+	"title":"Test Sample",
+	"description":"WhichOne Test Sample Description",
+	"nbMaxSectionLevel":1,
+	"detailsColumns":[
+		{
+			"name":"Titre",
+			"type":"s1"
+		},
+		{
+			"name":"Détail",
+			"type":"s1"
+		},
+		{
+			"name":"Lien",
+			"type":"url"
+		},
+		{
+			"name":"Loyer",
+			"type":"px"
+		}
+		
+	],
+	"applyQuantity":false,
+	"priceUnit":"euro",
+	"sections":[
+		{
+			"name":"Section 1",
+			"lines":[
+				[
+					{
+						"value":"Test1.1"
+					},
+					{
+						"value":"Test1.1 Description"
+					},
+					{
+						"value":"http://test1.1.com"
+					},
+					{
+						"value":100
+					}
+				],
+				[
+					{
+						"value":"Test1.2"
+					},
+					{
+						"value":"Test1.2 Description"
+					},
+					{
+						"value":"http://test1.2.com"
+					},
+					{
+						"value":220
+					}
+				],
+				[
+					{
+						"value":"Test1.3"
+					},
+					{
+						"value":"Test1.3 Description"
+					},
+					{
+						"value":"http://test1.3.com"
+					},
+					{
+						"value":303
+					}
+				]
+				
+			]
+		},
+		{
+			"name":"Section 2",
+			"lines":[
+				[
+					{
+						"value":"Test2.1"
+					},
+					{
+						"value":"Test2.1 Description"
+					},
+					{
+						"value":"http://test2.1.com"
+					},
+					{
+						"value":100
+					}
+				],
+				[
+					{
+						"value":"Test2.2"
+					},
+					{
+						"value":"Test2.2 Description"
+					},
+					{
+						"value":"http://test2.2.com"
+					},
+					{
+						"value":220
+					}
+				],
+				[
+					{
+						"value":"Test2.3"
+					},
+					{
+						"value":"Test2.3 Description"
+					},
+					{
+						"value":"http://test2.3.com"
+					},
+					{
+						"value":303
+					}
+				]
+				
+			]
+		}
+	]
+}

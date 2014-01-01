@@ -30,6 +30,7 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', [])
 	.directive('toggleHidden', function($timeout){
 		return {
 			restrict: 'A',
+			scope: true,
 			link: function(scope, $element, attrs) {
 				$timeout(function(){
 					if($("#"+attrs.toggleHidden+" .to_hide").is("*")){
@@ -72,6 +73,19 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', [])
 					})
 					.css({"border-bottom" : "1px dotted #999", "padding-bottom" : "-5px"});
 				});
+			}
+		};
+	})
+	.directive('table', function($timeout){
+		return {
+			restrict: 'A',
+			replace: true,
+			scope: { list : '='},
+			link: function(scope,$element, attrs){
+				var list = scope.list;
+				console.log(scope);
+				console.log(list);
+				console.log(scope.list.title);
 			}
 		};
 	});

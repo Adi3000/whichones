@@ -1,7 +1,18 @@
-package net.whichones.common.database.data;
+package net.whichones.common.lines.data;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import com.adi3000.common.database.hibernate.data.AbstractDataObject;
 
+@Entity
+@Table(name="section")
+@SequenceGenerator(name = "", sequenceName = "", allocationSize=1)
 public class Section extends AbstractDataObject{
 
 	
@@ -15,6 +26,7 @@ public class Section extends AbstractDataObject{
 	/**
 	 * @return the name
 	 */
+	@Column(name="section_name")
 	public String getName() {
 		return name;
 	}
@@ -27,6 +39,9 @@ public class Section extends AbstractDataObject{
 	/**
 	 * @return the id
 	 */
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "")
+	@Column(name="section_id")
 	public Integer getId() {
 		return id;
 	}
@@ -45,7 +60,9 @@ public class Section extends AbstractDataObject{
 	/**
 	 * @param index the index to set
 	 */
+	@Column(name="section_index")
 	public void setIndex(Integer index) {
 		this.index = index;
 	}
+
 }

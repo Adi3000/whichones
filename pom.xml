@@ -1,8 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+	<groupId>com.adi3000</groupId>
+	<artifactId>webapp</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+  </parent>
   <groupId>net.whichones</groupId>
   <artifactId>whichones</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.1.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <dependencies>
   	<dependency>
@@ -21,18 +26,94 @@
   		<artifactId>jaxws-api</artifactId>
   		<version>2.2.11</version>
   	</dependency>
+  	<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-json</artifactId>
+			<version>1.17.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-servlet</artifactId>
+			<version>1.17.1</version>
+		</dependency>
   </dependencies>
-  <build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  	<build>
+		<filters>
+			<filter>src/main/filters/environment/${filter.environment}/filters.properties</filter>
+		</filters>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<targetPath>${project.build.directory}/test-classes</targetPath>
+			</resource>
+		</resources>
+    </build>
+	<profiles>
+		<profile>
+			<id>development</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<filter.environment>development</filter.environment>
+			</properties>
+		</profile>
+		<profile>
+			<id>production</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<filter.environment>production</filter.environment>
+			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<filter.environment>test</filter.environment>
+				<liquibase.update.skip>true</liquibase.update.skip>
+				<liquibase.update.skip.test>false</liquibase.update.skip.test>
+				<liquibase.ant.update.skip>true</liquibase.ant.update.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>updateDb</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<liquibase.update.skip>false</liquibase.update.skip>
+				<liquibase.ant.update.skip>true</liquibase.ant.update.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>updateDbAnt</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<liquibase.update.skip>true</liquibase.update.skip>
+				<liquibase.ant.update.skip>false</liquibase.ant.update.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>skipUpdateDb</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<liquibase.update.skip>true</liquibase.update.skip>
+				<liquibase.update.skip.test>true</liquibase.update.skip.test>
+				<liquibase.ant.update.skip>true</liquibase.ant.update.skip>
+			</properties>
+		</profile>
+	</profiles>
 </project>

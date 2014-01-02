@@ -2,8 +2,7 @@
 	"id":"test",
 	"title":"Test Sample",
 	"description":"WhichOne Test Sample Description",
-	"nbMaxSectionLevel":1,
-	"detailsColumns":[
+	"headers":[
 		{
 			"name":"Titre",
 			"type":"s1"
@@ -18,108 +17,158 @@
 		},
 		{
 			"name":"Loyer",
-			"type":"px"
+			"type":"px",
+			"isValue":true
 		}
 		
 	],
 	"applyQuantity":false,
 	"priceUnit":"euro",
-	"sections":[
+	"lines":[
 		{
-			"name":"Section 1",
-			"lines":[
-				[
-					{
-						"value":"Test1.1"
-					},
-					{
-						"value":"Test1.1 Description"
-					},
-					{
-						"value":"http://test1.1.com"
-					},
-					{
-						"value":100
-					}
-				],
-				[
-					{
-						"value":"Test1.2"
-					},
-					{
-						"value":"Test1.2 Description"
-					},
-					{
-						"value":"http://test1.2.com"
-					},
-					{
-						"value":220
-					}
-				],
-				[
-					{
-						"value":"Test1.3"
-					},
-					{
-						"value":"Test1.3 Description"
-					},
-					{
-						"value":"http://test1.3.com"
-					},
-					{
-						"value":303
-					}
-				]
+			"id":1,		
+			"section":{
+				"name":"Section 1",
+				"id":1
+			},
+			"selected": true,
+			"data":[
+				{
+					"value":"Test1.1"
+				},
+				{
+					"value":"Test1.1 Description"
+				},
+				{
+					"value":"http://test1.1.com"
+				},
+				{
+					"value":100
+				}
 				
 			]
+			
 		},
 		{
-			"name":"Section 2",
-			"lines":[
-				[
-					{
-						"value":"Test2.1"
-					},
-					{
-						"value":"Test2.1 Description"
-					},
-					{
-						"value":"http://test2.1.com"
-					},
-					{
-						"value":100
-					}
-				],
-				[
-					{
-						"value":"Test2.2"
-					},
-					{
-						"value":"Test2.2 Description"
-					},
-					{
-						"value":"http://test2.2.com"
-					},
-					{
-						"value":220
-					}
-				],
-				[
-					{
-						"value":"Test2.3"
-					},
-					{
-						"value":"Test2.3 Description"
-					},
-					{
-						"value":"http://test2.3.com"
-					},
-					{
-						"value":303
-					}
-				]
+			"id":6,
+			"section":{
+				"name":"Section 1",
+				"id":1
+			},
+			"selected": true,
+			"data":[
+				{
+					"value":"Test1.2"
+				},
+				{
+					"value":"Test1.2 Description"
+				},
+				{
+					"value":"http://test1.2.com"
+				},
+				{
+					"value":220
+				}
 				
 			]
+			
+		},
+		{
+			"id":5,
+			"section":{
+				"name":"Section 1",
+				"id":1
+			},
+			"selected": false,
+			"data":[
+				{
+					"value":"Test1.3"
+				},
+				{
+					"value":"Test1.3 Description"
+				},
+				{
+					"value":"http://test1.3.com"
+				},
+				{
+					"value":303
+				}
+				
+			]
+			
+		},
+		{
+			"id":2,
+			"section":{
+				"name":"Section 2",
+				"id":2
+			},
+			"selected": true,
+			"data":[
+				{
+					"value":"Test2.1"
+				},
+				{
+					"value":"Test2.1 Description"
+				},
+				{
+					"value":"http://test2.1.com"
+				},
+				{
+					"value":100
+				}
+				
+			]
+			
+		},
+		{
+			"id":3,
+			"section":{
+				"name":"Section 2",
+				"id":2
+			},
+			"selected": true,
+			"data":[
+				{
+					"value":"Test2.2"
+				},
+				{
+					"value":"Test2.2 Description"
+				},
+				{
+					"value":"http://test2.2.com"
+				},
+				{
+					"value":220
+				}
+				
+			]
+			
+		},
+		{
+			"id":4,
+			"section":{
+				"name":"Section 2",
+				"id":2
+			},
+			"selected": false,
+			"data":[
+				{
+					"value":"Test2.3"
+				},
+				{
+					"value":"Test2.3 Description"
+				},
+				{
+					"value":"http://test2.3.com"
+				},
+				{
+					"value":303
+				}
+				
+			]
+			
 		}
+		
 	]
 }

@@ -27,7 +27,16 @@ function parseISO8601(dateStringInRange) {
 angular.module('whichOnesControllers', ['whichOnesServices'])
 	.controller('DataController', ['$scope', 'WhichOnesData',
         function($scope, WhichOnesData){
-			$scope.list = WhichOnesData.getSample();
+			$scope.sheet = WhichOnesData.getSample();
+			$scope.totals = {};
+			$scope.sheet.$promise.then(function(sheet){
+				angular.forEach($scope.sheet.headers, function(header,index){
+					if(header.isValue){
+						$scope.totals[index] = 0;
+					}
+				});
+				computeTotal(sheet.lines, $scope.totals);
+			});
 		}
 	]);
 

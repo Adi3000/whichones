@@ -1,8 +1,16 @@
 package net.whichones.common.sheet;
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+
+import net.whichones.common.lines.data.Line;
+
+import org.codehaus.jettison.json.JSONArray;
+import org.hibernate.annotations.Type;
 
 import com.adi3000.common.database.hibernate.data.AbstractDataObject;
 
@@ -15,9 +23,11 @@ public class Sheet extends AbstractDataObject{
 	private Integer id;
 	private String title;
 	private String description;
+	private JSONArray headers;
 	private String token;
 	private String password;
 	private User user;
+	private Set<Line> lines;
 	/**
 	 * @return the id
 	 */
@@ -96,6 +106,34 @@ public class Sheet extends AbstractDataObject{
 	 */
 	public void setUser(User user) {
 		this.user = user;
+	}
+	/**
+	 * @return the headers
+	 */
+	@Column(name="sheet_headers")
+	@Type(type="com.adi3000.common.database.hibernate.usertype.JSONArrayUserType")
+	public JSONArray getHeaders() {
+		return headers;
+	}
+	/**
+	 * @param headers the headers to set
+	 */
+	public void setHeaders(JSONArray headers) {
+		this.headers = headers;
+	}
+	/**
+	 * @return the lines
+	 */
+	@OneToMany
+	@JoinColumn(name="sheet_id")
+	public Set<Line> getLines() {
+		return lines;
+	}
+	/**
+	 * @param lines the lines to set
+	 */
+	public void setLines(Set<Line> lines) {
+		this.lines = lines;
 	}
 
 }

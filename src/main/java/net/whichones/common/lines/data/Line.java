@@ -10,13 +10,10 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import net.whichones.common.sheet.Sheet;
-
 import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.annotations.Type;
 
 import com.adi3000.common.database.hibernate.data.AbstractDataObject;
-import com.adi3000.common.database.hibernate.usertype.JSONObjectUserType;
 
 @Entity
 @Table(name="lines")
@@ -32,7 +29,7 @@ public class Line extends AbstractDataObject implements Comparable<Line>{
 	private JSONObject data;
 	private Group group;
 	private Section section;
-	private Sheet sheet;
+	private Boolean selected;
 	/**
 	 * @return the id
 	 */
@@ -102,17 +99,18 @@ public class Line extends AbstractDataObject implements Comparable<Line>{
 		this.section = section;
 	}
 	/**
-	 * @return the sheet
+	 * @return the selected
 	 */
-	@JoinColumn(name="sheet_id")
-	public Sheet getSheet() {
-		return sheet;
+	@Column(name="line_selected")
+	@Type(type="yes_no")
+	public Boolean getSelected() {
+		return selected;
 	}
 	/**
-	 * @param sheet the sheet to set
+	 * @param selected the selected to set
 	 */
-	public void setSheet(Sheet sheet) {
-		this.sheet = sheet;
+	public void setSelected(Boolean selected) {
+		this.selected = selected;
 	}
 	@Override
 	public int compareTo(Line o) {

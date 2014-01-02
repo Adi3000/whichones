@@ -10,6 +10,44 @@ body{
   background-repeat:no-repeat;
   background-attachment:fixed;
 }
+table{
+	border-collapse: collapse;
+	border-spacing:0px;
+}
+.line{
+	cursor: pointer;
+}
+.line td{
+	border-left: 1px dotted #000;
+	border-right: 1px dotted #000;
+	border-bottom: 0px dotted #000;
+	border-top: 0px dotted #000;;
+}
+th.section-even,
+.section-even td:first-child{
+	border-left: 1px solid #FFF;
+}
+th.section-even,
+.section-even td:last-child{
+	border-right: 1px solid #FFF;
+}
+th.section-odd,
+.section-odd td:first-child{
+	border-left: 1px solid #c8d3dc;
+}
+th.section-odd,
+.section-odd td:last-child{
+	border-right: 1px solid #c8d3dc;
+}
+th.section-even{
+	border-top: 1px solid #FFF;
+}
+th.section-odd{
+	border-top: 1px solid #c8d3dc;
+}
+
+
+
 .ui-widget-header {
 	border: 1px solid #c8d3dc;
 }

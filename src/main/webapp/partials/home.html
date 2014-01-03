@@ -1,10 +1,16 @@
 <div id="sheet" data-ng-controller="DataController">
 	<div id="list-header" class="ui-corner-all">
 		<div class="ui-widget-header ui-corner-top">
-			<div>{{ sheet.title }}</div>
-			<div>{{ sheet.description }}</div>
+			<div data-editable="sheet.title" ></div>
+			<div data-editable="sheet.description" ></div>
 		</div>
 		<table data-table="view" data-sheet="sheet" data-totals="totals">
+			<thead>
+				<tr>
+					<th>*</th>
+					<th data-ng-repeat="header in sheet.headers" data-editable="header.name">
+				</tr>
+			</thead>
 			<tbody data-nb-columns="{{sheet.headers.length +1}}">
 				<tr data-line="line" 
 					data-ng-repeat="line in sheet.lines" 

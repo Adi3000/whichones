@@ -96,13 +96,9 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 			scope: { sheet : '=', totals : '=', },
 			link: function(scope,$element, attrs){
 				scope.sheet.$promise.then(function(sheet){
-					var headers = $("<thead />").append($("<tr />"));
 					var footer = $("<tfoot />").append($("<tr />"));
 					angular.forEach(sheet.headers,function(header,index){
 						var totalValue = "";
-						headers.children("tr:first")
-							.append($("<th />")
-									.text(header.name));
 						if(header.isValue){
 							totalValue = "{{ totals."+index+" }}";
 						}
@@ -110,13 +106,35 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 							.append($("<td />")
 								.text(totalValue));
 					});
-					headers.children("tr:first").prepend($("<th />").text("*"));
 					footer.children("tr:first").prepend($("<td />").text(""));
 					$element.append(headers).append($compile(footer)(scope));
 				});
 			}
 		};
 	})
+	.directive('manageLine', ['WhichOnesSheetService', function(WhichOnesSheetService){
+		var manageLineTemplate = $("<div />")
+			.append(
+				$("<span />")
+				.attr("data-ng-click","delete()")
+				.addClass("ui-icon ui-icon-trash"))
+			.append(
+				$("<span />")
+				.attr("data-ng-click","removeSection()")
+				.addClass("ui-icon ui-icon-arrowreturn-1-s"))
+			.append(
+				$("<input />")
+				.attr("type","checkbox")
+				.addClass("checkbox")).html();
+		return {
+			restrict: 'A',
+			scope: { line : '='},
+			template : manageLineTemplate,
+			link: function(scope, $element){
+				console.log(scope.line);
+			}
+		};
+	}])
 	.directive('line',function($compile){
 		return {
 			restrict: 'A',
@@ -125,10 +143,8 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 				var lines = $("#sheet tbody");
 				var line = scope.line;
 				var nbColumn = lines.attr("data-nb-columns");
-				$element.append($("<td />").append(
-						$("<input />")
-							.attr("type","checkbox")
-							.addClass("checkbox")));
+				$element.append($compile($("<td />")
+						.attr("data-manage-line","line"))(scope));
 				if(!isEmpty(line.section)){
 					if(!$element.prev("tr").is("*") || line.section.id != $element.prev("tr").attr("data-section-id")){
 						evenSection = !evenSection;

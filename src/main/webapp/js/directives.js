@@ -107,7 +107,7 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 								.text(totalValue));
 					});
 					footer.children("tr:first").prepend($("<td />").text(""));
-					$element.append(headers).append($compile(footer)(scope));
+					$element.append($compile(footer)(scope));
 				});
 			}
 		};
@@ -116,7 +116,7 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 		var manageLineTemplate = $("<div />")
 			.append(
 				$("<span />")
-				.attr("data-ng-click","delete()")
+				.attr("data-ng-click","remove()")
 				.addClass("ui-icon ui-icon-trash"))
 			.append(
 				$("<span />")
@@ -128,10 +128,17 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 				.addClass("checkbox")).html();
 		return {
 			restrict: 'A',
-			scope: { line : '='},
 			template : manageLineTemplate,
-			link: function(scope, $element){
-				console.log(scope.line);
+			controller: function($scope, $element){
+				$scope.remove = function(){
+					if(confirm("whichones.msg.delete.confirm")){
+						WhichOnesSheetService.deleteLine(line); 
+					}
+				};
+				$scope.removeSection = function(){
+					WhichOnesSheetService.removeSectionForLine(line); 
+				};
+				console.log($scope.line);
 			}
 		};
 	}])
@@ -262,15 +269,10 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 	.directive('selectable', function($timeout){
 		return {
 			restrict: 'A',
-			link: function($scope,$element, attrs){
-				$scope.safeApply = safeApply;
-				$timeout(function(){
-					$element.click(function(){
-						$scope.safeApply(function(){
-							selectLine($element, $scope.sheet.lines, $scope.$parent.totals);
-						});
-					});
-				});
+			controller: function($scope,$element){
+				$scope.select = function(){
+					selectLine($element, $scope.sheet.lines, $scope.$parent.totals);
+				};
 			}
 		};
 	});

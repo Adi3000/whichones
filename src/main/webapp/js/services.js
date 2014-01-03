@@ -18,6 +18,16 @@ var whichOnesServices = angular.module('whichOnesServices', ['ngResource'])
 				saveSheet: function(){
 					console.log(this.sheet);
 					$rootScope.$broadcast( 'sheet.update' );
+				},
+				deleteLine: function(line){
+					var index = findLineIndex(this.sheet.lines, line.id);
+					delete this.sheet.lines[index];
+					$rootScope.$broadcast( 'sheet.update' );
+				},
+				removeSectionForLine: function(line){
+					var index = findLineIndex(this.sheet.lines, line.id);
+					delete this.sheet.lines[index].section;
+					$rootScope.$broadcast( 'sheet.update' );
 				}
 			};
 		}

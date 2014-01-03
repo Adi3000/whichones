@@ -23,20 +23,29 @@ function parseISO8601(dateStringInRange) {
   }
   return date;
 }
-
+function updateScopeSheet(sheet, $scope){
+	$scope.totals = {};
+	angular.forEach(sheet.headers, function(header,index){
+		if(header.isValue){
+			$scope.totals[index] = 0;
+		}
+	});
+	computeTotal(sheet.lines, $scope.totals);
+}
 angular.module('whichOnesControllers', ['whichOnesServices'])
-	.controller('DataController', ['$scope', 'WhichOnesData',
-        function($scope, WhichOnesData){
-			$scope.sheet = WhichOnesData.getSample();
+	.controller('DataController', ['$scope', 'WhichOnesSheetService',
+        function($scope, WhichOnesSheetService){
+			$scope.sheet = WhichOnesSheetService.sheet;
 			$scope.totals = {};
 			$scope.sheet.$promise.then(function(sheet){
-				angular.forEach($scope.sheet.headers, function(header,index){
-					if(header.isValue){
-						$scope.totals[index] = 0;
-					}
-				});
-				computeTotal(sheet.lines, $scope.totals);
+				updateScopeSheet(sheet, $scope);
 			});
+			$scope.$on( 'sheet.update', function( event ) {
+				updateScopeSheet($scope.sheet, $scope);
+			});
+			$scope.saveSheet = function(){
+				console.log($scope.sheet);
+			};
 		}
 	]);
 

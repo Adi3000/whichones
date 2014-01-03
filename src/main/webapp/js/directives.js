@@ -1,26 +1,12 @@
 'use strict';
 
-function computeTotal(lines,totals){
-	angular.forEach(Object.keys(totals),function(index){
-		totals[index] = 0;
-	});
-	angular.forEach(lines,function(line){
-		if(line.selected){
-			angular.forEach(Object.keys(totals),function(index){
-				totals[index] = totals[index] + line.data[index].value;
-			});
-		}
-	});
-}
 function selectLine(lineTag,lines,totals){
 	var selectedLine = findLine(lines, lineTag.attr("data-line-id")); 
 	if(selectedLine.selected){
 		selectedLine.selected = false;
-		lineTag.removeClass("selected-line");
 		$("input.checkbox",lineTag).prop("checked",false);
 	}else{
 		selectedLine.selected = true;
-		lineTag.addClass("selected-line");
 		$("input.checkbox",lineTag).prop("checked",true);
 	}
 	computeTotal(lines,totals);
@@ -29,7 +15,7 @@ var sectionEvenClass = "section-even";
 var sectionOddClass = "section-odd";
 var evenSection = true;
 /* Directives */
-var whichOnesDirectives = angular.module('whichOnesDirectives', [])
+var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesControllers'])
 	.directive('toggleDiv',function($timeout) {
 		return {
 			restrict: 'A',
@@ -144,46 +130,127 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', [])
 							.attr("type","checkbox")
 							.addClass("checkbox")));
 				if(!isEmpty(line.section)){
-					console.log($element.prev("tr"),$element.prev().attr("data-section-id"));
 					if(!$element.prev("tr").is("*") || line.section.id != $element.prev("tr").attr("data-section-id")){
 						evenSection = !evenSection;
 						var sectionTag = $("<tr />")
+							.attr("data-section-id", "{{line.section.id}}")
+							.attr("data-section-index", "{{line.section.index}}")
+							.addClass("sectionHeader")
 							.append($("<th />")
 									.attr("colspan",nbColumn)
-									.attr("data-section-id", line.section.id)
-									.addClass("sectionHeader")
+									.attr("data-editable", "line.section.name")
 									.addClass(evenSection ? sectionEvenClass : sectionOddClass)
-									.text(line.section.name));
-						$element.before(sectionTag);
+							);
+						$element.before($compile(sectionTag)(scope));
 					}
 					$element.addClass(evenSection ? sectionEvenClass : sectionOddClass);
 					$element.attr("data-section-id", line.section.id);
 				}else{
 					angular.noop();
 				}
-				angular.forEach(line.data, function(datum){
-					console.log(datum);
-					$element.append($("<td />")
-							.text(datum.value));
+				
+				angular.forEach(line.data, function(datum, index){
+					$element.append(
+						$compile($("<td />")
+							.attr("data-editable", "line.data["+index+"].value")
+							.append($("<input />")
+									.addClass("editable")
+									.attr({
+										"type": "text",
+										"data-ng-model": "line.data["+index+"].value"										
+									})))(scope));
 				});
 				if(line.selected){
-					$element.addClass("selected-line");
 					$("input.checkbox",$element).prop("checked",true);
 				}
 				$element
 					.addClass("line")
 					.attr({"data-selectable":"true","data-line-id" : line.id});
-				console.log($element);
 			}
 		};
 	})
+	.directive('editable',[ 'WhichOnesSheetService', function(WhichOnesSheetService){
+		var editorTemplate = 
+			$("<div />")
+				.addClass("editable")
+				.append(
+					$("<div />")
+						.attr("data-ng-hide", "editing")
+						.text("{{ value }}")
+						.append(
+							$("<span />")
+								.addClass("ui-icon ui-icon-pencil")
+								.attr("data-ng-click","edit()"))
+				)
+				.append($("<div />")
+					.attr("data-ng-show", "editing")
+					.append(
+						$("<input />")
+							.attr({
+								"type": "text",
+								"data-ng-model": "editingValue"
+							}))
+					.append(
+						$("<span />")
+							.addClass("save ui-icon ui-icon-check")
+							.attr("data-ng-click","save()"))
+					.append(
+						$("<span />")
+							.addClass("ui-icon ui-icon-closethick")
+							.attr("data-ng-click","close()"))
+				)
+				.html();
+		return {
+			restrict: 'A',
+			scope:{
+				value : "=editable",
+				modelToEdit : "@editable"
+			},
+	        template: editorTemplate,
+	        controller: function($scope, $element){
+	        	$scope.editing = false;
+	        	$scope.editingValue = $scope.value;
+	        	$scope.edit = function() {
+	                $scope.editing = true;
+	                $scope.editingValue = $scope.value;
+	            };
+
+	            $scope.close = function() {
+	                $scope.editing = false;
+		        	$scope.editingValue = $scope.value;
+	            };
+
+	            $scope.save = function() {
+	            	$scope.value = $scope.editingValue;
+	            	$scope.$watch($scope.modelToEdit,function(){WhichOnesSheetService.saveSheet();});
+	                WhichOnesSheetService.saveSheet();
+	                $scope.close();
+	            };
+	        },
+			link: function(scope,$element, attrs){
+				var editableZone = $(".ui-icon, input",$element);
+				editableZone
+					.click(function(e){
+						e.stopPropagation();
+					});
+				$("input",$element).keydown(function (e){
+				    if(e.keyCode == 13){
+				        $(this).siblings(".save").click();
+				    }
+				});
+				
+			}
+		};
+					
+	}])
 	.directive('selectable', function($timeout){
 		return {
 			restrict: 'A',
 			link: function($scope,$element, attrs){
+				$scope.safeApply = safeApply;
 				$timeout(function(){
 					$element.click(function(){
-						$scope.$apply(function(){
+						$scope.safeApply(function(){
 							selectLine($element, $scope.sheet.lines, $scope.$parent.totals);
 						});
 					});

@@ -6,7 +6,10 @@
 		</div>
 		<table data-table="view" data-sheet="sheet" data-totals="totals">
 			<tbody data-nb-columns="{{sheet.headers.length +1}}">
-				<tr data-line="line" data-ng-repeat="line in sheet.lines" data-selectable="true"></tr>
+				<tr data-line="line" 
+					data-ng-repeat="line in sheet.lines" 
+					data-selectable="true" 
+					data-ng-class="{selectedLine: line.selected}" />
 			</tbody>
 		</table>
 	</div>

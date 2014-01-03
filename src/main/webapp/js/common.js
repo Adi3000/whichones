@@ -172,7 +172,7 @@ function computeTotal(lines,totals){
 	angular.forEach(lines,function(line){
 		if(line.selected){
 			angular.forEach(Object.keys(totals),function(index){
-				totals[index] = totals[index] + line.data[index].value;
+				totals[index] = parseInt(totals[index]) + parseInt(line.data[index].value);
 			});
 		}
 	});
@@ -214,3 +214,13 @@ function findLine(list, id){
     }    
   } 
 })();
+function safeApply(fn){
+	var phase = this.$root.$$phase;
+	if(phase == '$apply' || phase == '$digest') {
+		if(fn && (typeof(fn) === 'function')) {
+			fn();
+		}
+	} else {
+		this.$apply(fn);
+	}
+}

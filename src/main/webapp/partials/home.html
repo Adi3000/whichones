@@ -7,16 +7,37 @@
 		<table data-table="view" data-sheet="sheet" data-totals="totals">
 			<thead>
 				<tr>
-					<th>*</th>
+					<th data-manage-sheet="sheet"></th>
 					<th data-ng-repeat="header in sheet.headers" data-editable="header.name">
 				</tr>
 			</thead>
 			<tbody data-nb-columns="{{sheet.headers.length +1}}">
 				<tr data-line="line" 
-					data-ng-repeat="line in sheet.lines" 
-					data-selectable="true" 
-					data-ng-class="{selectedLine: line.selected}" />
+					data-ng-repeat="line in orderedLines" 
+					data-selectable="line" 
+					data-ng-click="line.isSection || select()"
+					data-line-id="{{line.id}}"
+					data-ng-class="{selectedLine: line.selected}" class="line">
+					<th data-ng-if="line.isSection" 
+						class="sectionHeader" 
+						data-section-id="line.section.id"
+						data-editable="line.section.name" 
+						colspan="{{sheet.headers.length +1}}" />
+					<td data-manage-line="line" 
+						data-ng-if="!line.isSection" /> 
+					<td data-editable="datum.value" 
+						data-ng-if="!line.isSection" 
+						data-ng-repeat="datum in line.data" />
+				</tr>
 			</tbody>
+			<tfoot>
+				<tr>
+					<td>&nbsp;</td>
+					<td data-ng-repeat="header in sheet.headers" >
+						<span data-ng-if="header.isValue">{{header.total}}</span>
+					</td>
+				</tr>
+			</tfoot>
 		</table>
 	</div>
 </div>

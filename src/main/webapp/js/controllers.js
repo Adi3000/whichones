@@ -24,23 +24,27 @@ function parseISO8601(dateStringInRange) {
   return date;
 }
 function updateScopeSheet(sheet, $scope){
-	$scope.totals = {};
 	angular.forEach(sheet.headers, function(header,index){
 		if(header.isValue){
-			$scope.totals[index] = 0;
+			header.total = 0;
 		}
 	});
-	computeTotal(sheet.lines, $scope.totals);
+	computeTotal(sheet.lines, sheet.headers);
 }
 angular.module('whichOnesControllers', ['whichOnesServices'])
-	.controller('DataController', ['$scope', 'WhichOnesSheetService',
-        function($scope, WhichOnesSheetService){
-			$scope.sheet = WhichOnesSheetService.sheet;
+	.controller('DataController', ['$scope', '$rootScope', 'WhichOnesSheetService',
+        function($scope, $rootScope, WhichOnesSheetService){
 			$scope.totals = {};
-			$scope.sheet.$promise.then(function(sheet){
-				updateScopeSheet(sheet, $scope);
+			$scope.sheet = WhichOnesSheetService.sheet;
+			WhichOnesSheetService.prepareSheet();
+			$scope.$on( 'sheet.available', function( event ) {
+				$scope.sheet = WhichOnesSheetService.sheet;
+				$scope.orderedLines = WhichOnesSheetService.getOrderedLine();
+				updateScopeSheet($scope.sheet, $scope);
+				$rootScope.$broadcast('sheet.ready');
 			});
 			$scope.$on( 'sheet.update', function( event ) {
+				$scope.orderedLines = WhichOnesSheetService.getOrderedLine();
 				updateScopeSheet($scope.sheet, $scope);
 			});
 			$scope.saveSheet = function(){

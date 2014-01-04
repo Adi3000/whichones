@@ -1,7 +1,7 @@
 'use strict';
 
-function selectLine(lineTag,lines,totals){
-	var selectedLine = findLine(lines, lineTag.attr("data-line-id")); 
+function selectLine(lineTag,sheet){
+	var selectedLine = findLine(sheet.lines, lineTag.attr("data-line-id")); 
 	if(selectedLine.selected){
 		selectedLine.selected = false;
 		$("input.checkbox",lineTag).prop("checked",false);
@@ -9,111 +9,49 @@ function selectLine(lineTag,lines,totals){
 		selectedLine.selected = true;
 		$("input.checkbox",lineTag).prop("checked",true);
 	}
-	computeTotal(lines,totals);
+	computeTotal(sheet.lines,sheet.headers);
 }
-var sectionEvenClass = "section-even";
-var sectionOddClass = "section-odd";
+
+var sectionEvenClass = "sectionEven";
+var sectionOddClass = "sectionOdd";
 var evenSection = true;
 /* Directives */
 var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesControllers'])
-	.directive('toggleDiv',function($timeout) {
+	.directive('manageSheet', ['WhichOnesSheetService', function(WhichOnesSheetService){
+		var manageLineTemplate = $("<div />")
+			.append(
+				$("<span />")
+					.attr("data-ng-click","addColumn()")
+					.addClass("ui-icon ui-icon-plus"))
+			.append(
+				$("<span />")
+					.attr("data-ng-click","addSection()")
+					.addClass("ui-icon ui-icon-arrowreturn-1-s"))
+			.append(
+				$("<input />")
+					.attr("type","checkbox")
+					.addClass("checkbox")).html();
 		return {
 			restrict: 'A',
-			link: function(scope, $element, attrs) {
-				$timeout(function(){
-					$element.click(function(){
-						if($("#"+attrs.toggleDiv).is(":visible")){
-							$("#"+attrs.toggleDiv).hide(200, function(){
-								$element.children(".ui-icon")
-									.removeClass("ui-icon-minus")
-									.addClass("ui-icon-plus");
-							});
-						}else{
-							$("#"+attrs.toggleDiv).show(200, function(){
-								$element.children(".ui-icon")
-								.addClass("ui-icon-minus")
-								.removeClass("ui-icon-plus");
-							});
-						}
-					});
-					$element.css("cursor","pointer");
-				});
-			}
-		};
-	})
-	.directive('toggleHidden', function($timeout){
-		return {
-			restrict: 'A',
-			scope: true,
-			link: function(scope, $element, attrs) {
-				$timeout(function(){
-					if($("#"+attrs.toggleHidden+" .to_hide").is("*")){
-						$element.parent().click(function(){
-							if($("#"+attrs.toggleHidden+" .to_hide").is(":visible")){
-								$("#"+attrs.toggleHidden+" .to_hide").hide(200,function(){
-									$element
-										.removeClass("ui-icon-minusthick")
-										.addClass("ui-icon-plusthick");
-								}); 
-							}else{
-								$("#"+attrs.toggleHidden+" .to_hide").show(200,function(){
-									$element
-									.addClass("ui-icon-minusthick")
-									.removeClass("ui-icon-plusthick");
-								}); 
-							}
-						});
-						$element.css("cursor","pointer");
-					}else{
-						$element.remove();
-					}
-				});
-			}
-		};
-	})
-	.directive('tooltip', function($timeout){
-		return {
-			restrict: 'A',
-			link: function(scope, $element, attrs) {
-				$timeout(function(){
-					$element.powerTip({
-						placement : 'n',
-						mouseOnToPopup : true
-					})
-					.data('powertipjq', function(){
-						var tip = $(this).parent().children(".tooltip").clone();
-						tip.removeClass("tooltip");
-						return tip;
-					})
-					.css({"border-bottom" : "1px dotted #999", "padding-bottom" : "-5px"});
-				});
-			}
-		};
-	})
-	.directive('table', function($compile){
-		return {
-			restrict: 'A',
-			scope: { sheet : '=', totals : '=', },
+			template : manageLineTemplate,
+			controller: function($scope, $element, $compile){
+				$scope.addColumn = function(){
+					WhichOnesSheetService.addColumn($scope.line); 
+				};
+			},
 			link: function(scope,$element, attrs){
-				scope.sheet.$promise.then(function(sheet){
-					var footer = $("<tfoot />").append($("<tr />"));
-					angular.forEach(sheet.headers,function(header,index){
-						var totalValue = "";
-						if(header.isValue){
-							totalValue = "{{ totals."+index+" }}";
-						}
-						footer.children("tr:first")
-							.append($("<td />")
-								.text(totalValue));
-					});
-					footer.children("tr:first").prepend($("<td />").text(""));
-					$element.append($compile(footer)(scope));
+				$(".ui-icon",$element).click(function(e){
+					e.stopPropagation();
 				});
 			}
 		};
-	})
+	}])
 	.directive('manageLine', ['WhichOnesSheetService', function(WhichOnesSheetService){
 		var manageLineTemplate = $("<div />")
+			.append(
+				$("<span />")
+				.attr("data-ng-click","add()")
+				.addClass("ui-icon ui-icon-plus"))
 			.append(
 				$("<span />")
 				.attr("data-ng-click","remove()")
@@ -129,16 +67,28 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 		return {
 			restrict: 'A',
 			template : manageLineTemplate,
-			controller: function($scope, $element){
+			controller: function($scope, $element, $compile){
+				$scope.add = function(){
+					WhichOnesSheetService.addLineAfter($scope.line); 
+				};
 				$scope.remove = function(){
 					if(confirm("whichones.msg.delete.confirm")){
-						WhichOnesSheetService.deleteLine(line); 
+						WhichOnesSheetService.deleteLine($scope.line); 
+						console.log($scope);
 					}
 				};
 				$scope.removeSection = function(){
-					WhichOnesSheetService.removeSectionForLine(line); 
+					WhichOnesSheetService.removeSectionForLine($scope.line); 
+					console.log($element.parent("tr").removeClass("sectionOdd sectionEven"));
 				};
-				console.log($scope.line);
+			},
+			link: function(scope,$element, attrs){
+				if(scope.$parent.line.selected){
+					$("input.checkbox",$element).prop("checked",true);
+				}
+				$(".ui-icon",$element).click(function(e){
+					e.stopPropagation();
+				});
 			}
 		};
 	}])
@@ -147,48 +97,16 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 			restrict: 'A',
 			scope: { line : '='},
 			link: function(scope,$element, attrs){
-				var lines = $("#sheet tbody");
 				var line = scope.line;
-				var nbColumn = lines.attr("data-nb-columns");
-				$element.append($compile($("<td />")
-						.attr("data-manage-line","line"))(scope));
-				if(!isEmpty(line.section)){
-					if(!$element.prev("tr").is("*") || line.section.id != $element.prev("tr").attr("data-section-id")){
-						evenSection = !evenSection;
-						var sectionTag = $("<tr />")
-							.attr("data-section-id", "{{line.section.id}}")
-							.attr("data-section-index", "{{line.section.index}}")
-							.addClass("sectionHeader")
-							.append($("<th />")
-									.attr("colspan",nbColumn)
-									.attr("data-editable", "line.section.name")
-									.addClass(evenSection ? sectionEvenClass : sectionOddClass)
-							);
-						$element.before($compile(sectionTag)(scope));
-					}
+				if(line.isSection){
+					evenSection = !evenSection;
 					$element.addClass(evenSection ? sectionEvenClass : sectionOddClass);
-					$element.attr("data-section-id", line.section.id);
 				}else{
-					angular.noop();
+					if(!angular.isUndefined(line.section)){
+						$element.addClass(evenSection ? sectionEvenClass : sectionOddClass);
+					}
 				}
 				
-				angular.forEach(line.data, function(datum, index){
-					$element.append(
-						$compile($("<td />")
-							.attr("data-editable", "line.data["+index+"].value")
-							.append($("<input />")
-									.addClass("editable")
-									.attr({
-										"type": "text",
-										"data-ng-model": "line.data["+index+"].value"										
-									})))(scope));
-				});
-				if(line.selected){
-					$("input.checkbox",$element).prop("checked",true);
-				}
-				$element
-					.addClass("line")
-					.attr({"data-selectable":"true","data-line-id" : line.id});
 			}
 		};
 	})
@@ -259,6 +177,9 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 				$("input",$element).keydown(function (e){
 				    if(e.keyCode == 13){
 				        $(this).siblings(".save").click();
+				        if($(this).parent("td").next("td").children("input").is(":visible")){
+				        	$(this).parent("td").next("td").children("input").focus();
+				        }
 				    }
 				});
 				
@@ -271,7 +192,7 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 			restrict: 'A',
 			controller: function($scope,$element){
 				$scope.select = function(){
-					selectLine($element, $scope.sheet.lines, $scope.$parent.totals);
+					selectLine($element, $scope.sheet);
 				};
 			}
 		};

@@ -23,26 +23,26 @@ table{
 	border-bottom: 0px dotted #000;
 	border-top: 0px dotted #000;;
 }
-th.section-even,
-.section-even td:first-child{
+.sectionEven th,
+.sectionEven td:first-child{
 	border-left: 1px solid #FFF;
 }
-th.section-even,
-.section-even td:last-child{
+.sectionEven th,
+.sectionEven td:last-child{
 	border-right: 1px solid #FFF;
 }
-th.section-odd,
-.section-odd td:first-child{
+.sectionOdd th,
+.sectionOdd td:first-child{
 	border-left: 1px solid #c8d3dc;
 }
-th.section-odd,
-.section-odd td:last-child{
+.sectionOdd th,
+.sectionOdd td:last-child{
 	border-right: 1px solid #c8d3dc;
 }
-th.section-even{
+.sectionEven th{
 	border-top: 1px solid #FFF;
 }
-th.section-odd{
+.sectionOdd th{
 	border-top: 1px solid #c8d3dc;
 }
 

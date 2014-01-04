@@ -165,14 +165,18 @@ function findLineIndex(list, id){
  * @param lines
  * @param totals
  */
-function computeTotal(lines,totals){
-	angular.forEach(Object.keys(totals),function(index){
-		totals[index] = 0;
+function computeTotal(lines,headers){
+	angular.forEach(headers,function(header){
+		if(header.isValue){
+			header.total = 0;
+		}
 	});
 	angular.forEach(lines,function(line){
 		if(line.selected){
-			angular.forEach(Object.keys(totals),function(index){
-				totals[index] = parseInt(totals[index]) + parseInt(line.data[index].value);
+			angular.forEach(headers,function(header,index){
+				if(header.isValue){
+					header.total = parseInt(header.total) + parseInt(line.data[index].value);
+				}
 			});
 		}
 	});

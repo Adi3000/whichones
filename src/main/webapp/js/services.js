@@ -46,8 +46,29 @@ var whichOnesServices = angular.module('whichOnesServices', ['ngResource'])
 					});
 					return orderedSheet;
 				},
+				mapSections : function(){
+					var sections = {};
+					var sheet = this.sheet;
+					angular.forEach(sheet.lines,function(line, index){
+						if(!angular.isUndefined(line.section)){
+							if(angular.isUndefined(sections[line.section.id])){
+								sections[line.section.id] = line.section;
+							}
+							line.section = sections[line.section.id] ;
+						}
+					});
+					return sections;
+				},
 				saveSheet: function(){
 					console.log(this.sheet);
+					$rootScope.$broadcast( 'sheet.update' );
+				},
+				saveLine: function(id){
+					console.log(findLine(this.sheet.lines, id));
+					$rootScope.$broadcast( 'sheet.update' );
+				},
+				saveSection: function(section){
+					console.log(section);
 					$rootScope.$broadcast( 'sheet.update' );
 				},
 				prepareSheet: function(){

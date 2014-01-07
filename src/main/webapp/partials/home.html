@@ -1,4 +1,4 @@
-<div id="sheet" data-ng-controller="DataController">
+<div id="sheet" data-ng-controller="WhichOnesSheetController">
 	<div id="list-header" class="ui-corner-all">
 		<div class="ui-widget-header ui-corner-top">
 			<div data-editable="sheet.title" ></div>
@@ -25,8 +25,9 @@
 						colspan="{{sheet.headers.length +1}}" />
 					<td data-manage-line="line" 
 						data-ng-if="!line.isSection" /> 
-					<td data-editable="datum.value" 
+					<td data-editable="datum.value"
 						data-ng-if="!line.isSection" 
+						class="line"
 						data-ng-repeat="datum in line.data" />
 				</tr>
 			</tbody>

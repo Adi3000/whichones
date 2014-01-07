@@ -18,13 +18,15 @@ var evenSection = true;
 /* Directives */
 var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesControllers'])
 	.directive('manageSheet', ['WhichOnesSheetService', function(WhichOnesSheetService){
-		var manageLineTemplate = $("<div />")
+		var manageSheetTemplate = $("<div />")
 			.append(
 				$("<span />")
+					.attr("data-ng-if", "role.editor")
 					.attr("data-ng-click","addColumn()")
 					.addClass("ui-icon ui-icon-plus"))
 			.append(
 				$("<span />")
+					.attr("data-ng-if", "role.editor")
 					.attr("data-ng-click","addSection()")
 					.addClass("ui-icon ui-icon-arrowreturn-1-s"))
 			.append(
@@ -33,8 +35,10 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 					.addClass("checkbox")).html();
 		return {
 			restrict: 'A',
-			template : manageLineTemplate,
+			template : manageSheetTemplate,
+			scope : true,
 			controller: function($scope, $element, $compile){
+	        	$scope.role = $scope.$parent.role;
 				$scope.addColumn = function(){
 					WhichOnesSheetService.addColumn($scope.line); 
 				};
@@ -50,24 +54,29 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 		var manageLineTemplate = $("<div />")
 			.append(
 				$("<span />")
-				.attr("data-ng-click","add()")
-				.addClass("ui-icon ui-icon-plus"))
-			.append(
+					.attr("data-ng-if", "role.editor")
+					.attr("data-ng-click","add()")
+					.addClass("ui-icon ui-icon-plus"))
+				.append(
 				$("<span />")
-				.attr("data-ng-click","remove()")
-				.addClass("ui-icon ui-icon-trash"))
-			.append(
+					.attr("data-ng-if", "role.editor")
+					.attr("data-ng-click","remove()")
+					.addClass("ui-icon ui-icon-trash"))
+				.append(
 				$("<span />")
-				.attr("data-ng-click","removeSection()")
-				.addClass("ui-icon ui-icon-arrowreturn-1-s"))
-			.append(
+					.attr("data-ng-if", "role.editor")
+					.attr("data-ng-click","removeSection()")
+					.addClass("ui-icon ui-icon-arrowreturn-1-s"))
+				.append(
 				$("<input />")
-				.attr("type","checkbox")
-				.addClass("checkbox")).html();
+					.attr("type","checkbox")
+					.addClass("checkbox")).html();
 		return {
 			restrict: 'A',
 			template : manageLineTemplate,
+			scope : true,
 			controller: function($scope, $element, $compile){
+	        	$scope.role = $scope.$parent.role;
 				$scope.add = function(){
 					WhichOnesSheetService.addLineAfter($scope.line); 
 				};
@@ -92,6 +101,91 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 			}
 		};
 	}])
+	.directive('editable',[ 'WhichOnesSheetService', function(WhichOnesSheetService){
+		var editorTemplate = 
+			$("<div />")
+				.addClass("editable")
+				.append(
+					$("<div />")
+						.attr("data-ng-hide", "editing")
+						.text("{{ value }}")
+						.append(
+					$("<span />")
+						.attr("data-ng-if", "role.editor")
+						.addClass("ui-icon ui-icon-pencil")
+						.attr("data-ng-click","edit()"))
+			)
+			.append(
+				$("<div />")
+					.attr("data-ng-if", "role.editor")
+					.attr("data-ng-show", "editing")
+					.append(
+						$("<input />")
+						.attr({
+							"type": "text",
+							"data-ng-model": "editingValue"
+						}))
+					.append(
+						$("<span />")
+						.addClass("save ui-icon ui-icon-check")
+						.attr("data-ng-click","save()"))
+					.append(
+						$("<span />")
+						.addClass("ui-icon ui-icon-closethick")
+						.attr("data-ng-click","close()"))
+			).html();
+		return {
+			restrict: 'A',
+			scope:{
+				value : "=editable",
+				modelToEdit : "@editable",
+				initEditing:"="
+			},
+			template: editorTemplate,
+			controller: function($scope, $element){
+				$scope.role = $scope.$parent.role;
+				$scope.editingValue = $scope.value;
+				$scope.editing = $scope.initEditing;
+				$scope.edit = function() {
+					$scope.editing = true;
+					$scope.editingValue = $scope.value;
+				};
+				
+				$scope.close = function() {
+					$scope.editing = false;
+					$scope.editingValue = $scope.value;
+				};
+				
+				$scope.save = function() {
+					$scope.value = $scope.editingValue;
+					$scope.$watch($scope.modelToEdit,function(){
+						if($element.hasClass("line")){
+							WhichOnesSheetService.saveLine($element.parent("tr").attr("data-line-id"));
+						}else{
+							WhichOnesSheetService.saveSheet();
+						}
+					});
+					$scope.close();
+				};
+			},
+			link: function(scope,$element, attrs){
+				var editableZone = $(".ui-icon, input",$element);
+				editableZone
+				.click(function(e){
+					e.stopPropagation();
+				});
+				$("input",$element).keydown(function (e){
+					if(e.keyCode == 13){
+						$(this).siblings(".save").click();
+						if($(this).parent("td").next("td").children("input").is(":visible")){
+							$(this).parent("td").next("td").children("input").focus();
+						}
+					}
+				});
+			}
+		};
+		
+	}])
 	.directive('line',function($compile){
 		return {
 			restrict: 'A',
@@ -110,83 +204,6 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 			}
 		};
 	})
-	.directive('editable',[ 'WhichOnesSheetService', function(WhichOnesSheetService){
-		var editorTemplate = 
-			$("<div />")
-				.addClass("editable")
-				.append(
-					$("<div />")
-						.attr("data-ng-hide", "editing")
-						.text("{{ value }}")
-						.append(
-							$("<span />")
-								.addClass("ui-icon ui-icon-pencil")
-								.attr("data-ng-click","edit()"))
-				)
-				.append($("<div />")
-					.attr("data-ng-show", "editing")
-					.append(
-						$("<input />")
-							.attr({
-								"type": "text",
-								"data-ng-model": "editingValue"
-							}))
-					.append(
-						$("<span />")
-							.addClass("save ui-icon ui-icon-check")
-							.attr("data-ng-click","save()"))
-					.append(
-						$("<span />")
-							.addClass("ui-icon ui-icon-closethick")
-							.attr("data-ng-click","close()"))
-				)
-				.html();
-		return {
-			restrict: 'A',
-			scope:{
-				value : "=editable",
-				modelToEdit : "@editable"
-			},
-	        template: editorTemplate,
-	        controller: function($scope, $element){
-	        	$scope.editing = false;
-	        	$scope.editingValue = $scope.value;
-	        	$scope.edit = function() {
-	                $scope.editing = true;
-	                $scope.editingValue = $scope.value;
-	            };
-
-	            $scope.close = function() {
-	                $scope.editing = false;
-		        	$scope.editingValue = $scope.value;
-	            };
-
-	            $scope.save = function() {
-	            	$scope.value = $scope.editingValue;
-	            	$scope.$watch($scope.modelToEdit,function(){WhichOnesSheetService.saveSheet();});
-	                WhichOnesSheetService.saveSheet();
-	                $scope.close();
-	            };
-	        },
-			link: function(scope,$element, attrs){
-				var editableZone = $(".ui-icon, input",$element);
-				editableZone
-					.click(function(e){
-						e.stopPropagation();
-					});
-				$("input",$element).keydown(function (e){
-				    if(e.keyCode == 13){
-				        $(this).siblings(".save").click();
-				        if($(this).parent("td").next("td").children("input").is(":visible")){
-				        	$(this).parent("td").next("td").children("input").focus();
-				        }
-				    }
-				});
-				
-			}
-		};
-					
-	}])
 	.directive('selectable', function($timeout){
 		return {
 			restrict: 'A',

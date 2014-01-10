@@ -17,7 +17,7 @@ import com.adi3000.common.database.hibernate.data.AbstractDataObject;
 
 @Entity
 @Table(name="lines")
-@SequenceGenerator(name = "", sequenceName = "", allocationSize=1)
+@SequenceGenerator(name = "lines_line_id_seq", sequenceName = "lines_line_id_seq", allocationSize=1)
 public class Line extends AbstractDataObject implements Comparable<Line>{
 
 	/**
@@ -34,7 +34,7 @@ public class Line extends AbstractDataObject implements Comparable<Line>{
 	 * @return the id
 	 */
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lines_line_id_seq")
 	@Column(name="line_id")
 	public Integer getId() {
 		return id;

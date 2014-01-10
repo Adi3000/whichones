@@ -16,26 +16,11 @@ var sectionEvenClass = "sectionEven";
 var sectionOddClass = "sectionOdd";
 var evenSection = true;
 /* Directives */
-var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesControllers'])
+var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesControllers', 'pascalprecht.translate'])
 	.directive('manageSheet', ['WhichOnesSheetService', function(WhichOnesSheetService){
-		var manageSheetTemplate = $("<div />")
-			.append(
-				$("<span />")
-					.attr("data-ng-if", "role.editor")
-					.attr("data-ng-click","addColumn()")
-					.addClass("ui-icon ui-icon-plus"))
-			.append(
-				$("<span />")
-					.attr("data-ng-if", "role.editor")
-					.attr("data-ng-click","addSection()")
-					.addClass("ui-icon ui-icon-arrowreturn-1-s"))
-			.append(
-				$("<input />")
-					.attr("type","checkbox")
-					.addClass("checkbox")).html();
 		return {
 			restrict: 'A',
-			template : manageSheetTemplate,
+			templateUrl : 'template/manage-sheet.html',
 			scope : true,
 			controller: function($scope, $element, $compile){
 	        	$scope.role = $scope.$parent.role;
@@ -50,38 +35,28 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 			}
 		};
 	}])
-	.directive('manageLine', ['WhichOnesSheetService', function(WhichOnesSheetService){
-		var manageLineTemplate = $("<div />")
-			.append(
-				$("<span />")
-					.attr("data-ng-if", "role.editor")
-					.attr("data-ng-click","add()")
-					.addClass("ui-icon ui-icon-plus"))
-				.append(
-				$("<span />")
-					.attr("data-ng-if", "role.editor")
-					.attr("data-ng-click","remove()")
-					.addClass("ui-icon ui-icon-trash"))
-				.append(
-				$("<span />")
-					.attr("data-ng-if", "role.editor")
-					.attr("data-ng-click","removeSection()")
-					.addClass("ui-icon ui-icon-arrowreturn-1-s"))
-				.append(
-				$("<input />")
-					.attr("type","checkbox")
-					.addClass("checkbox")).html();
+	.directive('button',function(){
 		return {
 			restrict: 'A',
-			template : manageLineTemplate,
+			link: function(scope,$element, attrs){
+				$element.click(function(e){
+					e.stopPropagation();
+				});
+			}
+		};
+	})
+	.directive('manageLine', ['WhichOnesSheetService', function(WhichOnesSheetService){
+		return {
+			restrict: 'A',
+			templateUrl : 'template/manage-line.html',
 			scope : true,
-			controller: function($scope, $element, $compile){
+			controller: function($scope, $element, $compile, $translate){
 	        	$scope.role = $scope.$parent.role;
 				$scope.add = function(){
 					WhichOnesSheetService.addLineAfter($scope.line); 
 				};
 				$scope.remove = function(){
-					if(confirm("whichones.msg.delete.confirm")){
+					if(confirm($translate("MSG_DELETE_CONFIRM"))){
 						WhichOnesSheetService.deleteLine($scope.line); 
 						console.log($scope);
 					}
@@ -101,51 +76,20 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 			}
 		};
 	}])
-	.directive('editable',[ 'WhichOnesSheetService', function(WhichOnesSheetService){
-		var editorTemplate = 
-			$("<div />")
-				.addClass("editable")
-				.append(
-					$("<div />")
-						.attr("data-ng-hide", "editing")
-						.text("{{ value }}")
-						.append(
-					$("<span />")
-						.attr("data-ng-if", "role.editor")
-						.addClass("ui-icon ui-icon-pencil")
-						.attr("data-ng-click","edit()"))
-			)
-			.append(
-				$("<div />")
-					.attr("data-ng-if", "role.editor")
-					.attr("data-ng-show", "editing")
-					.append(
-						$("<input />")
-						.attr({
-							"type": "text",
-							"data-ng-model": "editingValue"
-						}))
-					.append(
-						$("<span />")
-						.addClass("save ui-icon ui-icon-check")
-						.attr("data-ng-click","save()"))
-					.append(
-						$("<span />")
-						.addClass("ui-icon ui-icon-closethick")
-						.attr("data-ng-click","close()"))
-			).html();
+	.directive('editable',[ 'WhichOnesSheetService', function(WhichOnesSheetService, $translate){
 		return {
 			restrict: 'A',
 			scope:{
 				value : "=editable",
 				modelToEdit : "@editable",
-				initEditing:"="
+				initEditing:"=",
+				mandatory: "="
 			},
-			template: editorTemplate,
+			templateUrl: 'template/editable.html',
 			controller: function($scope, $element){
+				$scope.editing = $scope.initEditing;
 				$scope.role = $scope.$parent.role;
 				$scope.editingValue = $scope.value;
-				$scope.editing = $scope.initEditing;
 				$scope.edit = function() {
 					$scope.editing = true;
 					$scope.editingValue = $scope.value;
@@ -156,37 +100,47 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 					$scope.editingValue = $scope.value;
 				};
 				
-				$scope.save = function() {
-					$scope.value = $scope.editingValue;
-					$scope.$watch($scope.modelToEdit,function(){
-						if($element.hasClass("line")){
-							WhichOnesSheetService.saveLine($element.parent("tr").attr("data-line-id"));
-						}else{
-							WhichOnesSheetService.saveSheet();
+				$scope.save = function(editingValue) {
+					if(!isEmpty(editingValue) || !($scope.mandatory)){
+						$scope.value = editingValue;
+						if($scope.initEditing){
+							delete $scope.initEditing;
+							console.log($scope);
 						}
-					});
-					$scope.close();
+						$scope.$watch($scope.modelToEdit,function(){
+							if($element.hasClass("line")){
+								WhichOnesSheetService.saveLine($element.parent("tr").attr("data-line-id"));
+							}else{
+								WhichOnesSheetService.saveSheet();
+							}
+						});
+						$scope.close();
+					}else{
+						alert($translate("MSG_MANDATORY"));
+					}
 				};
-			},
+			}
+		};
+		
+	}])
+	.directive('editableZone',function(){
+		return {
+			restrict: 'A',
 			link: function(scope,$element, attrs){
 				var editableZone = $(".ui-icon, input",$element);
 				editableZone
 				.click(function(e){
 					e.stopPropagation();
 				});
-				$("input",$element).keydown(function (e){
+				$("input.editField",$element).keydown(function (e){
 					if(e.keyCode == 13){
 						$(this).siblings(".save").click();
-						if($(this).parent("td").next("td").children("input").is(":visible")){
-							$(this).parent("td").next("td").children("input").focus();
-						}
 					}
 				});
 			}
 		};
-		
-	}])
-	.directive('line',function($compile){
+	})
+	.directive('line',function(){
 		return {
 			restrict: 'A',
 			scope: { line : '='},
@@ -204,7 +158,18 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 			}
 		};
 	})
-	.directive('selectable', function($timeout){
+	.directive('create', function(WhichOnesSheetService){
+		return {
+			restrict: 'A',
+			scope: { sheet : '=create'},
+			controller: function($scope,$element){
+				$scope.create = function(){
+					WhichOnesSheetService.selectLine($scope.sheet);
+				};
+			}
+		};
+	})
+	.directive('selectable', function(){
 		return {
 			restrict: 'A',
 			controller: function($scope,$element){

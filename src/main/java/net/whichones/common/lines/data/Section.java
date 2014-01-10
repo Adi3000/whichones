@@ -11,8 +11,8 @@ import javax.persistence.Table;
 import com.adi3000.common.database.hibernate.data.AbstractDataObject;
 
 @Entity
-@Table(name="section")
-@SequenceGenerator(name = "", sequenceName = "", allocationSize=1)
+@Table(name="sections")
+@SequenceGenerator(name = "sections_section_id_seq", sequenceName = "sections_section_id_seq", allocationSize=1)
 public class Section extends AbstractDataObject{
 
 	
@@ -40,7 +40,7 @@ public class Section extends AbstractDataObject{
 	 * @return the id
 	 */
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sections_section_id_seq")
 	@Column(name="section_id")
 	public Integer getId() {
 		return id;

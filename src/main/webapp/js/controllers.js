@@ -9,12 +9,14 @@ function updateScopeSheet(sheet, $scope){
 	});
 	computeTotal(sheet.lines, sheet.headers);
 }
-angular.module('whichOnesControllers', ['whichOnesServices'])
-	.controller('WhichOnesSheetController', ['$scope', '$rootScope', 'WhichOnesSheetService',
-        function($scope, $rootScope, WhichOnesSheetService){
+angular.module('whichOnesControllers', ['whichOnesServices', 'ngRoute'])
+	.controller('WhichOnesSheetController', ['$scope', '$rootScope', '$routeParams', 'WhichOnesSheetService',
+        function($scope, $rootScope, $routeParams, WhichOnesSheetService){
+			console.log($routeParams);
+			var sheetToken = angular.isUndefined($routeParams.sheet) ? null : $routeParams.sheet;
 			$scope.role = { "editor" : true };
 			$scope.totals = {};
-			$scope.sheet = WhichOnesSheetService.sheet;
+			$scope.sheet = WhichOnesSheetService.getSheet(sheetToken);
 			WhichOnesSheetService.prepareSheet();
 			$scope.$on( 'sheet.available', function( event ) {
 				$scope.sections = WhichOnesSheetService.mapSections();

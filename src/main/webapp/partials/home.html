@@ -1,14 +1,23 @@
 <div id="sheet" data-ng-controller="WhichOnesSheetController">
+	<div data-ng-if="sheet.isNew" data-create="sheet">
+		<input type="button" value="{{ 'LB_CREATE_SHEET' | translate }}" data-ng-click="create()" />
+	</div>
 	<div id="list-header" class="ui-corner-all">
 		<div class="ui-widget-header ui-corner-top">
-			<div data-editable="sheet.title" ></div>
-			<div data-editable="sheet.description" ></div>
+			<div data-editable="sheet.title" 
+				 data-init-editing="sheet.isNew" 
+				 data-mandatory="true"
+				 data-placeholder=""></div>
+			<div data-editable="sheet.description" data-init-editing="sheet.isNew" ></div>
 		</div>
 		<table data-table="view" data-sheet="sheet" data-totals="totals">
 			<thead>
 				<tr>
 					<th data-manage-sheet="sheet"></th>
-					<th data-ng-repeat="header in sheet.headers" data-editable="header.name">
+					<th data-ng-repeat="header in sheet.headers" 
+						data-editable="header.name" 
+						data-mandatory="true"
+						data-init-editing="header.isNew">
 				</tr>
 			</thead>
 			<tbody data-nb-columns="{{sheet.headers.length +1}}">
@@ -22,10 +31,13 @@
 						class="sectionHeader" 
 						data-section-id="line.section.id"
 						data-editable="line.section.name" 
+						data-mandatory="true"
+						data-init-editing="line.section.isNew"
 						colspan="{{sheet.headers.length +1}}" />
-					<td data-manage-line="line" 
+					<td data-manage-line="line"
 						data-ng-if="!line.isSection" /> 
 					<td data-editable="datum.value"
+						data-init-editing="datum.isNew"
 						data-ng-if="!line.isSection" 
 						class="line"
 						data-ng-repeat="datum in line.data" />

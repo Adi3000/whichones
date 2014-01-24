@@ -33,6 +33,8 @@
 				<value>net.whichones.common.lines.data.Section</value>
 				<value>net.whichones.common.lines.data.Group</value>
 				<value>net.whichones.common.lines.data.Line</value>
+				<value>net.whichones.common.sheet.data.Sheet</value>
+				<value>net.whichones.common.sheet.data.User</value>
 			</list>
 		</property>
 	</bean>

@@ -83,7 +83,8 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 				value : "=editable",
 				modelToEdit : "@editable",
 				initEditing:"=",
-				mandatory: "="
+				mandatory: "=",
+				placeholder: "@"
 			},
 			templateUrl: 'template/editable.html',
 			controller: function($scope, $element){

@@ -1,4 +1,11 @@
-
+function updateScopeSheet(sheet, $scope){
+	angular.forEach(sheet.headers, function(header,index){
+		if(header.value){
+			header.total = 0;
+		}
+	});
+	computeTotal(sheet.lines, sheet.headers);
+}
 /**Parses string formatted as YYYY-MM-DD to a Date object.
  * If the supplied string does not match the format, an 
  * invalid Date (value NaN) is returned.
@@ -189,14 +196,14 @@ function findLineIndex(list, id){
  */
 function computeTotal(lines,headers){
 	angular.forEach(headers,function(header){
-		if(header.isValue){
+		if(header.value){
 			header.total = 0;
 		}
 	});
 	angular.forEach(lines,function(line){
 		if(line.selected){
 			angular.forEach(headers,function(header,index){
-				if(header.isValue){
+				if(header.value){
 					header.total = parseInt(header.total) + parseInt(line.data[index].value);
 				}
 			});

@@ -1,21 +1,12 @@
 'use strict';
 
-/* Controllers */
-function updateScopeSheet(sheet, $scope){
-	angular.forEach(sheet.headers, function(header,index){
-		if(header.isValue){
-			header.total = 0;
-		}
-	});
-	computeTotal(sheet.lines, sheet.headers);
-}
 angular.module('whichOnesControllers', ['whichOnesServices', 'ngRoute'])
-	.controller('WhichOnesSheetController', ['$scope', '$rootScope', '$routeParams', 'WhichOnesSheetService',
-        function($scope, $rootScope, $routeParams, WhichOnesSheetService){
-			console.log($routeParams);
-			var sheetToken = angular.isUndefined($routeParams.sheet) ? null : $routeParams.sheet;
+	.controller('WhichOnesSheetController', ['$scope', '$rootScope', '$location', 'WhichOnesSheetService',
+        function($scope, $rootScope, $location, WhichOnesSheetService){
+			var sheetToken = angular.isUndefined($location.search().sheet) ? null : $location.search().sheet;
 			$scope.role = { "editor" : true };
 			$scope.totals = {};
+			//Load that sheet
 			$scope.sheet = WhichOnesSheetService.getSheet(sheetToken);
 			WhichOnesSheetService.prepareSheet();
 			$scope.$on( 'sheet.available', function( event ) {
@@ -30,9 +21,18 @@ angular.module('whichOnesControllers', ['whichOnesServices', 'ngRoute'])
 				updateScopeSheet($scope.sheet, $scope);
 			});
 			$scope.saveSheet = function(){
+				WhichOnesSheetService.saveSheet();
 				console.log($scope.sheet);
 			};
+			$scope.create = function(){
+				WhichOnesSheetService.createSheet($scope.sheet);
+				console.log($scope.sheet);
+			};
+			$scope.$on('code.available', function(e){
+				var sample = angular.isUndefined($location.search().sheet) ? null : $location.search().sheet;
+				$scope.sheet = WhichOnesSheetService.getSheet(sample);
+				WhichOnesSheetService.prepareSheet();
+			});
 		}
 	]);
-
 

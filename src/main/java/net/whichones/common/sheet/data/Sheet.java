@@ -1,5 +1,7 @@
 package net.whichones.common.sheet.data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -11,19 +13,27 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import net.whichones.common.lines.data.Line;
 
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.adi3000.common.database.hibernate.data.AbstractDataObject;
 
 @Entity
 @Table(name="sheets")
 @SequenceGenerator(name = "sheets_sheet_id_seq", sequenceName = "sheets_sheet_id_seq", allocationSize=1)
+@XmlRootElement
 public class Sheet extends AbstractDataObject{
-
+	private static final Logger log = LoggerFactory.getLogger(Sheet.class);
 	/**
 	 * 
 	 */
@@ -31,11 +41,12 @@ public class Sheet extends AbstractDataObject{
 	private Integer id;
 	private String title;
 	private String description;
-	private JSONArray headers;
+	private List<Header> headers;
 	private String token;
 	private String password;
 	private User user;
 	private Set<Line> lines;
+	private Boolean newSheet;
 	/**
 	 * @return the id
 	 */
@@ -87,6 +98,7 @@ public class Sheet extends AbstractDataObject{
 	/**
 	 * @param token the token to set
 	 */
+	@NaturalId
 	public void setToken(String token) {
 		this.token = token;
 	}
@@ -121,14 +133,32 @@ public class Sheet extends AbstractDataObject{
 	 */
 	@Column(name="sheet_headers")
 	@Type(type="com.adi3000.common.database.hibernate.usertype.JSONArrayUserType")
-	public JSONArray getHeaders() {
-		return headers;
+	@XmlTransient
+	public JSONArray getHeadersJSON() {
+		try {
+			return Header.toJSONArray(headers);
+		} catch (JSONException e) {
+			log.error("Can't parse JSon for database",e);
+			return null;
+		}
 	}
 	/**
 	 * @param headers the headers to set
 	 */
-	public void setHeaders(JSONArray headers) {
-		this.headers = headers;
+	public void setHeadersJSON(JSONArray headersJson) {
+		if(headersJson == null){
+			this.headers = null;
+		}else{		
+			try {
+				this.headers = new ArrayList<>(headersJson.length());
+				for(int i = 0; i < headersJson.length(); i++){
+					this.headers.add(new Header( headersJson.getJSONObject(i)));
+				}
+			} catch (JSONException e) {
+				log.error("Can't parse JSon from database",e);
+			}
+		}
+			
 	}
 	/**
 	 * @return the lines
@@ -143,6 +173,32 @@ public class Sheet extends AbstractDataObject{
 	 */
 	public void setLines(Set<Line> lines) {
 		this.lines = lines;
+	}
+	/**
+	 * @return the newSheet
+	 */
+	@Transient
+	public Boolean getNewSheet() {
+		return newSheet;
+	}
+	/**
+	 * @param newSheet the newSheet to set
+	 */
+	public void setNewSheet(Boolean newSheet) {
+		this.newSheet = newSheet;
+	}
+	/**
+	 * @return the headers
+	 */
+	@Transient
+	public List<Header> getHeaders() {
+		return headers;
+	}
+	/**
+	 * @param headers the headers to set
+	 */
+	public void setHeaders(List<Header> headers) {
+		this.headers = headers;
 	}
 
 }

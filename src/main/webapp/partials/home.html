@@ -1,14 +1,17 @@
 <div id="sheet" data-ng-controller="WhichOnesSheetController">
-	<div data-ng-if="sheet.isNew" data-create="sheet">
+	<div data-ng-if="sheet.newSheet" data-create="sheet">
 		<input type="button" value="{{ 'LB_CREATE_SHEET' | translate }}" data-ng-click="create()" />
 	</div>
 	<div id="list-header" class="ui-corner-all">
 		<div class="ui-widget-header ui-corner-top">
 			<div data-editable="sheet.title" 
-				 data-init-editing="sheet.isNew" 
+				 data-init-editing="sheet.newSheet" 
 				 data-mandatory="true"
-				 data-placeholder=""></div>
-			<div data-editable="sheet.description" data-init-editing="sheet.isNew" ></div>
+				 data-placeholder="{{ 'LB_SHEET_TITLE' | translate }}"></div>
+			<div 
+				data-editable="sheet.description" 
+				data-init-editing="sheet.newSheet" 
+				data-placeholder="{{ 'LB_SHEET_DESCRIPTION' | translate }}" ></div>
 		</div>
 		<table data-table="view" data-sheet="sheet" data-totals="totals">
 			<thead>
@@ -16,8 +19,9 @@
 					<th data-manage-sheet="sheet"></th>
 					<th data-ng-repeat="header in sheet.headers" 
 						data-editable="header.name" 
+						data-placeholder="{{ 'LB_COLUMN_FILED' | translate }}"
 						data-mandatory="true"
-						data-init-editing="header.isNew">
+						data-init-editing="header.newSheet">
 				</tr>
 			</thead>
 			<tbody data-nb-columns="{{sheet.headers.length +1}}">
@@ -32,12 +36,13 @@
 						data-section-id="line.section.id"
 						data-editable="line.section.name" 
 						data-mandatory="true"
-						data-init-editing="line.section.isNew"
+						data-placeholder="{{ 'LB_SECTION_FILED' | translate }}"
+						data-init-editing="line.section.newSheet"
 						colspan="{{sheet.headers.length +1}}" />
 					<td data-manage-line="line"
 						data-ng-if="!line.isSection" /> 
 					<td data-editable="datum.value"
-						data-init-editing="datum.isNew"
+						data-init-editing="datum.newSheet"
 						data-ng-if="!line.isSection" 
 						class="line"
 						data-ng-repeat="datum in line.data" />
@@ -47,7 +52,7 @@
 				<tr>
 					<td>&nbsp;</td>
 					<td data-ng-repeat="header in sheet.headers" >
-						<span data-ng-if="header.isValue">{{header.total}}</span>
+						<span data-ng-if="header.value">{{header.total}}</span>
 					</td>
 				</tr>
 			</tfoot>

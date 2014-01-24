@@ -1,5 +1,8 @@
 package net.whichones.common.lines.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,8 +13,11 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.hibernate.annotations.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.adi3000.common.database.hibernate.data.AbstractDataObject;
 
@@ -24,9 +30,10 @@ public class Line extends AbstractDataObject implements Comparable<Line>{
 	 * 
 	 */
 	private static final long serialVersionUID = 3369287660890190816L;
+	private static final Logger log = LoggerFactory.getLogger(Line.class);
 	private Integer id;
 	private Integer index;
-	private JSONObject data;
+	private List<Data> data;
 	private Group group;
 	private Section section;
 	private Boolean selected;
@@ -62,15 +69,31 @@ public class Line extends AbstractDataObject implements Comparable<Line>{
 	 * @return the data
 	 */
 	@Column(name="line_data")
-	@Type(type="com.adi3000.common.database.hibernate.usertype.JSONObjectUserType")
-	public JSONObject getData() {
-		return data;
+	@Type(type="com.adi3000.common.database.hibernate.usertype.JSONArrayUserType")
+	public JSONArray getDataJSON() {
+		try {
+			return Data.toJSONArray(data);
+		} catch (JSONException e) {
+			log.error("Can't parse JSon for database",e);
+			return null;
+		}
 	}
 	/**
 	 * @param data the data to set
 	 */
-	public void setData(JSONObject data) {
-		this.data = data;
+	public void setDataJSON(JSONArray dataJson) {
+		if(data == null){
+			this.data = null;
+		}else{
+			try {
+				this.data = new ArrayList<>(dataJson.length());
+				for(int i = 0; i < dataJson.length(); i++){
+					this.data.add(new Data(dataJson.getJSONObject(i)));
+				}
+			} catch (JSONException e) {
+				log.error("Can't parse JSon from database",e);
+			}
+		}
 	}
 	/**
 	 * @return the group
@@ -111,6 +134,19 @@ public class Line extends AbstractDataObject implements Comparable<Line>{
 	 */
 	public void setSelected(Boolean selected) {
 		this.selected = selected;
+	}
+	/**
+	 * @return the data
+	 */
+	@Transient
+	public List<Data> getData() {
+		return data;
+	}
+	/**
+	 * @param data the data to set
+	 */
+	public void setData(List<Data> data) {
+		this.data = data;
 	}
 	@Override
 	public int compareTo(Line o) {

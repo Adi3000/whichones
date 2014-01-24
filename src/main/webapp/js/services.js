@@ -16,24 +16,32 @@ function orderSheet(sheet){
 
 /* Services */
 
-var whichOnesServices = angular.module('whichOnesServices', ['ngResource', 'pascalprecht.translate'])
+var whichOnesServices = angular.module('whichOnesServices', ['ngResource'])
 	.factory('WhichOnesData', ['$resource',
 	   function($resource){
-			return $resource('/rest/data', {tokenId: '@tokenId' }, {
+			return $resource('rest/sheet/:tokenId', {tokenId: '@tokenId' }, {
 				auth: {method:'POST', params:{password:'@password'}, isArray:false},
-				getNewSheet: {method:'GET', url:'/data/newSheet.json', isArray:false},		
-				getSample: {method:'GET', url:'/data/sample.json', isArray:false},
-				create: {method: 'POST'}
+				getNewSheet: {method:'GET', url:'data/newSheet.json', isArray:false},		
+				getSample1: {method:'GET', url:'data/sample1.json', isArray:false},
+				getSample2: {method:'GET', url:'data/sample2.json', isArray:false},
+				getSample3: {method:'GET', url:'data/sample3.json', isArray:false},
+				create: {method: 'POST', url: 'rest/sheet/create', isArray: false}
 			});
 	   }
 	])
-	.service('WhichOnesSheetService', ['$rootScope', 'WhichOnesData', '$translate',
+	.service('WhichOnesSheetService', ['$rootScope', 'WhichOnesData',
         function($rootScope, WhichOnesData, $translate){
 			return {
 				sheet : null,
 				getSheet : function (tokenId){
 					if(tokenId == null){
 						this.sheet = WhichOnesData.getNewSheet();
+					}else if(tokenId == "sample1"){
+						this.sheet = WhichOnesData.getSample1();
+					}else if(tokenId == "sample2"){
+						this.sheet = WhichOnesData.getSample2();
+					}else if(tokenId == "sample3"){
+						this.sheet = WhichOnesData.getSample3();
 					}else{
 						this.sheet = WhichOnesData.get({"tokenId" : tokenId});
 					}
@@ -69,7 +77,7 @@ var whichOnesServices = angular.module('whichOnesServices', ['ngResource', 'pasc
 				},
 				saveSheet: function(){
 					console.log(this.sheet);
-					$rootScope.$broadcast( 'sheet.update' );
+					$rootScope.$broadcast( 'sheet.available' );
 				},
 				saveLine: function(id){
 					console.log(findLine(this.sheet.lines, id));
@@ -79,8 +87,15 @@ var whichOnesServices = angular.module('whichOnesServices', ['ngResource', 'pasc
 					console.log(section);
 					$rootScope.$broadcast( 'sheet.update' );
 				},
-				create: function(sheet){
-					
+				createSheet: function(sheet){
+					sheet.id = null;
+					angular.forEach(sheet.lines,function(line){
+						line.id = null;
+					});
+					var newSheet = WhichOnesData.create(sheet);
+					console.log(newSheet);
+					this.sheet = newSheet;
+					$rootScope.$broadcast( 'sheet.available' );
 				},
 				prepareSheet: function(){
 					this.sheet.$promise.then(function(sheet){
@@ -98,15 +113,15 @@ var whichOnesServices = angular.module('whichOnesServices', ['ngResource', 'pasc
 						newLine.section = { "name" : line.section.name,  "id" : line.section.id };
 					}
 					angular.forEach(line.data,function(datum){
-						newLine.data.push({"value" : "", "isNew" : true });
+						newLine.data.push({"value" : "", "newValuenewValue" : true });
 					});
 					this.sheet.lines.push(newLine);
-					$rootScope.$broadcast( 'sheet.update' );
+					$rootScope.$broadcast( 'sheet.available' );
 				},
 				addColumn: function(){
-					this.sheet.headers.push({ "name" : $translate("HP_NEW_COLUMN"), "type" : "s1" , "isNew" : true });
+					this.sheet.headers.push({ "name" : "", "type" : "s1" , "newValue" : true });
 					angular.forEach(this.sheet.lines, function(line){
-						line.data.push({"value" : "", "isNew" : true});
+						line.data.push({"value" : "", "newValue" : true});
 					});
 					console.log(this.sheet);
 					$rootScope.$broadcast( 'sheet.update' );

@@ -1,5 +1,6 @@
 'use strict';
 
+/* Controllers */
 angular.module('whichOnesControllers', ['whichOnesServices', 'ngRoute'])
 	.controller('WhichOnesSheetController', ['$scope', '$rootScope', '$location', 'WhichOnesSheetService',
         function($scope, $rootScope, $location, WhichOnesSheetService){
@@ -9,6 +10,10 @@ angular.module('whichOnesControllers', ['whichOnesServices', 'ngRoute'])
 			//Load that sheet
 			$scope.sheet = WhichOnesSheetService.getSheet(sheetToken);
 			WhichOnesSheetService.prepareSheet();
+			$scope.$on( 'sheet.created', function( event ) {
+				console.log("created",$scope);
+				$location.search("sheet",$scope.sheet.token);
+			});
 			$scope.$on( 'sheet.available', function( event ) {
 				$scope.sections = WhichOnesSheetService.mapSections();
 				$scope.sheet = WhichOnesSheetService.sheet;
@@ -25,7 +30,8 @@ angular.module('whichOnesControllers', ['whichOnesServices', 'ngRoute'])
 				console.log($scope.sheet);
 			};
 			$scope.create = function(){
-				WhichOnesSheetService.createSheet($scope.sheet);
+				$scope.sheet = WhichOnesSheetService.createSheet($scope.sheet);
+				WhichOnesSheetService.controleNewSheet();
 				console.log($scope.sheet);
 			};
 			$scope.$on('code.available', function(e){

@@ -141,7 +141,7 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 			}
 		};
 	})
-	.directive('line',function(){
+	.directive('line',function($timeout){
 		return {
 			restrict: 'A',
 			scope: { line : '='},
@@ -151,11 +151,14 @@ var whichOnesDirectives = angular.module('whichOnesDirectives', ['whichOnesContr
 					evenSection = !evenSection;
 					$element.addClass(evenSection ? sectionEvenClass : sectionOddClass);
 				}else{
-					if(!angular.isUndefined(line.section)){
+					if(!isEmpty(line.section)){
 						$element.addClass(evenSection ? sectionEvenClass : sectionOddClass);
 					}
+					$timeout(function(){
+						$element.mouseenter(function(){$(this).addClass("lineHover");});
+						$element.mouseleave(function(){$(this).removeClass("lineHover");});
+					});
 				}
-				
 			}
 		};
 	})

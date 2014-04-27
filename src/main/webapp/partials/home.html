@@ -5,7 +5,7 @@
 	<div id="list-header" class="ui-corner-all">
 		<div class="ui-widget-header ui-corner-top">
 			<div data-editable="sheet.title" 
-				 data-init-editing="sheet.newSheet" 
+ 				 data-init-editing="sheet.newSheet" 
 				 data-mandatory="true"
 				 data-placeholder="{{ 'LB_SHEET_TITLE' | translate }}"></div>
 			<div 
@@ -42,7 +42,7 @@
 					<td data-manage-line="line"
 						data-ng-if="!line.isSection" /> 
 					<td data-editable="datum.value"
-						data-init-editing="datum.newSheet"
+						data-init-editing="datum.newValue"
 						data-ng-if="!line.isSection" 
 						class="line"
 						data-ng-repeat="datum in line.data" />

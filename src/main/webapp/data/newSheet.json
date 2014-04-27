@@ -1,6 +1,6 @@
 {
 	"title":"",
-	"newSheet" : true,
+	"newSheet":true,
 	"description":"",
 	"headers":[
 		{
@@ -16,17 +16,20 @@
 	],
 	"lines":[
 		{
-			"selected": true,
+			"selected":true,
 			"data":[
 				{
 					"value":"",
-					"newValue" : true
+					"newValue":true
 				},
 				{
-					"value": 0,
-					"newValue" : true
+					"value":0,
+					"newValue":true
 				}
+				
 			]
+			
 		}
+		
 	]
 }
